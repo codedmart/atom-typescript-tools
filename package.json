@@ -1,0 +1,21 @@
+{
+  "name": "atom-typescript-tools",
+  "main": "./lib/init",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Validates your typescript code.",
+  "repository": "https://github.com/park9140/atom-typescript-tools.git",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "scripts": {
+      "install": "node_modules/.bin/tsc lib/init.ts --module commonjs"
+  },
+  "dependencies": {
+    "typescript": "~1.0.0",
+    "typescript-source": "git+https://git01.codeplex.com/typescript",
+    "font-awesome": "~4.0.3",
+    "temp": "~0.7.0"
+  }
+}
