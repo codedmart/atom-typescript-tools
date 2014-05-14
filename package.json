@@ -10,12 +10,12 @@
     "atom": ">0.50.0"
   },
   "scripts": {
-      "install": "node_modules/.bin/tsc lib/init.ts --module commonjs"
+    "install": "node_modules/.bin/tsc lib/init.ts --module commonjs"
   },
   "dependencies": {
     "typescript": "~1.0.0",
-    "typescript-source": "git+https://git01.codeplex.com/typescript",
     "font-awesome": "~4.0.3",
-    "temp": "~0.7.0"
+    "temp": "~0.7.0",
+    "underscore": "~1.6.0"
   }
 }

@@ -1,3 +1,5 @@
+///<reference path="../node_modules/typescript-toolbox/typescript/tss.d.ts" />
+
 interface IRequire {
     (library: string): any;
 }
@@ -15,7 +17,5 @@ declare module 'atom' {
         function getActivePaneItem(): any;
     }
 }
-
-declare var require: IRequire;
 
 declare var atom;

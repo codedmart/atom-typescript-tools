@@ -1,6 +1,6 @@
-/// <reference path="./globals.d.ts" />
-import TypescriptToolsView = require("./typescript-tools-view");
-import StatusBarView = require("./statusbar-view");
+/// <reference path='./globals.d.ts' />
+import TypescriptToolsView = require('./typescript-tools-view');
+import StatusBarView = require('./statusbar-view');
 
 var initialObject = {
     configDefaults: {
@@ -9,8 +9,6 @@ var initialObject = {
     },
     // Activate the plugin
     activate: function() {
-        atom.workspaceView.command("typescript-tools:toggle", () => this.toggle());
-
         return this.enable();
 
         // App = new App
@@ -31,7 +29,7 @@ var initialObject = {
         if (!editorView.attached) {
             return;
         }
-        if (editorView.editor.getGrammar().scopeName == "source.ts" ) {
+        if (editorView.editor.getGrammar().scopeName == 'source.ts' ) {
             new TypescriptToolsView(editorView, statusBarView);
         }
     }

@@ -1,0 +1,16 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  '.workspace':
+      'Format typescript': 'atom-typescript-tools:format'
+
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'typescript'
+      'submenu': [
+        { 'label': 'Format', 'command': 'atom-typescript-tools:format' }
+      ]
+    ]
+  }
+]
