@@ -1,7 +1,7 @@
 {
   "name": "atom-typescript-tools",
   "main": "./lib/init",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "description": "Provides typescript tooling for atom (compilation validation)",
   "repository": "https://github.com/park9140/atom-typescript-tools.git",
