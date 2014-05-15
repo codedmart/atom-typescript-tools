@@ -29,14 +29,20 @@ class StatusBarView extends Atom.View {
             paneItem = atom.workspaceView.getActivePaneItem();
         }
         currentLine = void 0;
-        if (position = paneItem != null ? typeof paneItem.getCursorBufferPosition === 'function' ? paneItem.getCursorBufferPosition() : void 0 : void 0) {
+        if (position = paneItem != null ?
+            typeof paneItem.getCursorBufferPosition === 'function' ?
+            paneItem.getCursorBufferPosition() : void 0 : void 0) {
             currentLine = position.row + 1;
         }
         this.violations.empty();
         i = 0;
         return messages.map((item) => {
-            if (parseInt(item.line) === currentLine && i <= 10) {
-                this.violations.append('<dt><span class=\'highlight-' + item.level + '\'>' + (item.typescriptTools) + '</span></dt><dd>' + item.message + '</dd>');
+            if (parseInt(item.line, 10) === currentLine && i <= 10) {
+                this.violations.append('<dt><span class=\'highlight-' +
+                    item.level +
+                    '\'>' +
+                    (item.typescriptTools) +
+                    '</span></dt><dd>' + item.message + '</dd>');
                 this.show();
                 return i++;
             }

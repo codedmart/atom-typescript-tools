@@ -1,23 +1,46 @@
 ///<reference path='./globals.d.ts' />
 // The base class for linters.
 // Subclasses must at a minimum define the attributes syntax, cmd, and regex.
+declare var __dirname;
 import TypeScript = require('../node_modules/typescript-toolbox/typescript/tss');
 import Harness = require('./typescript-harness');
 var _ = require('underscore');
+var fs = require('fs');
+var path = require('path');
 
-function readFile(file) { return TypeScript.IO.readFile(file,null) }
+function loadFile(root, file) {
+    var filename = file.path.indexOf('/') === 0 ? file : path.resolve(root, file.path);
+    if (filename.indexOf('.ts') !== filename.length - 3 && filename.indexOf('.js') !== filename.length - 3) {
+        if (fs.existsSync(filename + '.ts')) {
+            filename += '.ts';
+        } else if (fs.existsSync(filename + '.js')) {
+            filename += '.js';
+        } else {
+            console.log(filename, 'not found');
+            return;
+        }
+    }
+    return {filename: filename, content: fs.readFileSync(filename, {encoding: 'utf8'}) };
+}
 
 class TypescriptTools {
     private languageServiceHost;
     private languageService;
     private formatCodeOptions;
     private languageServiceCompiler;
+    private coreService;
 
     constructor() {
         this.languageServiceHost = new Harness.LanguageServiceHostImpl();
         this.languageService = new TypeScript.Services.LanguageService(this.languageServiceHost);
         this.languageServiceCompiler = new TypeScript.Services.LanguageServiceCompiler(this.languageServiceHost);
+        this.coreService = new TypeScript.Services.CoreServices(new Harness.CoreServiceHostImpl());
         this.formatCodeOptions = this.createDefaultFormatCodeOptions();
+        var globals = path.resolve(__dirname, '../node_modules/typescript/bin/lib.d.ts');
+        this.addFileInfo(
+            globals,
+            fs.readFileSync(globals, {encoding: 'utf8'})
+        );
     }
 
     createDefaultFormatCodeOptions() {
@@ -26,8 +49,33 @@ class TypescriptTools {
 
 
     updateFileInfo(filename: string, content: string) {
+        var filesToLoad: any[] = [{filename: filename, content: content}],
+            filesLoaded: string[] = [],
+            fileToLoad: any;
+
+        while (fileToLoad = filesToLoad.pop()) {
+            if (filesLoaded.indexOf(fileToLoad.filename) === -1) {
+                filesLoaded.push(fileToLoad.filename);
+                this.addFileInfo(fileToLoad.filename, fileToLoad.content);
+
+                var pfi = this.coreService.getPreProcessedFileInfo(
+                    fileToLoad.filename,
+                    this.languageServiceHost.getScriptSnapshot(fileToLoad.filename)
+                );
+                filesToLoad = filesToLoad.concat(_.map(pfi.importedFiles, _.partial(loadFile, path.dirname(fileToLoad.filename))));
+                filesToLoad = filesToLoad.concat(_.map(pfi.referencedFiles, _.partial(loadFile, path.dirname(fileToLoad.filename))));
+            }
+        }
+
+        console.log();
+    }
+
+    addFileInfo(filename, content) {
         var file = this.languageServiceHost.getFile(filename),
-            version = file ? file.version + 1 : 0;
+            version = file ? file.version : 0;
+        if (file && file.snapshot.getText(0, file.snapshot.getLength()) !== content) {
+            version = version + 1;
+        }
         this.languageServiceHost.addFile({
             fileName: filename,
             version: version,
@@ -35,8 +83,7 @@ class TypescriptTools {
             byteOrderMark: TypeScript.ByteOrderMark.None,
             snapshot: TypeScript.ScriptSnapshot.fromString(content)
         });
-        console.log(this.languageServiceCompiler.fileNames());
-        console.log('loading file', filename, content.length);
+        console.log(filename);
     }
 
     removeFileInfo(filename) {
@@ -61,7 +108,7 @@ class TypescriptTools {
 
         var syntactic = this.languageService.getSyntacticDiagnostics(filename);
         var semantic = this.languageService.getSemanticDiagnostics(filename);
-        return _.reduce(syntactic.concat(semantic), (memo, diagnostic) => {
+        return _.reduce(semantic.concat(syntactic), (memo, diagnostic) => {
             var message = {
                 message: diagnostic.message(),
                 line: diagnostic.line() + 1,

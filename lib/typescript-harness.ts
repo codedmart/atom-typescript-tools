@@ -8,6 +8,9 @@ export class FileInfo {
     byteOrderMark: TypeScript.ByteOrderMark;
     snapshot: TypeScript.IScriptSnapshot;
 }
+export class CoreServiceHostImpl implements TypeScript.Services.ICoreServicesHost {
+        logger: TypeScript.ILogger = new TypeScript.NullLogger();
+}
 
 export class LanguageServiceHostImpl implements TypeScript.Services.ILanguageServiceHost {
     compilationSettings = new TypeScript.CompilationSettings();

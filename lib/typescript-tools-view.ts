@@ -12,7 +12,7 @@ class TypescriptToolsView {
     public gutterView;
     public statusBarView;
     public typescriptTools;
-
+    public refresh;
     public messages = [];
 
     // Instantiate the views
@@ -25,6 +25,12 @@ class TypescriptToolsView {
         this.editorView = editorView;
         this.gutterView = new GutterView(editorView);
         this.statusBarView = statusBarView;
+
+        this.refresh = _.debounce(() => {
+            console.log('debounced');
+            this.typescriptTools.updateFileInfo(this.editor.getUri(), this.editor.getText());
+            this.processMessage(this.typescriptTools.getDiagnostics(this.editor.getUri()));
+        }, 100);
 
         atom.workspaceView.on('pane:active-item-changed', () => {
             this.statusBarView.hide();
@@ -43,6 +49,8 @@ class TypescriptToolsView {
         this.editorView.on('editor:display-updated', () => this.gutterView.render(this.messages));
 
         this.editorView.on('cursor:moved', () => this.statusBarView.render(this.messages));
+
+        this.refresh();
     }
 
     handleBufferEvents() {
@@ -50,9 +58,7 @@ class TypescriptToolsView {
         buffer = this.editor.getBuffer();
 
         buffer.on('saved', (buffer) => {
-            this.typescriptTools.updateFileInfo(this.editor.getUri(), this.editor.getText());
-            this.processMessage(this.typescriptTools.getDiagnostics(this.editor.getUri()));
-
+            this.refresh();
         });
 
         buffer.on('destroyed', () => {
@@ -63,15 +69,13 @@ class TypescriptToolsView {
             return buffer.off('destroyed');
         });
 
-        this.editorView.on('contents-modified', () => {
-
-            this.typescriptTools.updateFileInfo(this.editor.getUri(), this.editor.getText());
-            this.processMessage(this.typescriptTools.getDiagnostics(this.editor.getUri()));
+        this.editor.on('contents-modified', () => {
+            this.refresh();
         });
     }
 
     processMessage(messages) {
-        this.messages = this.messages.concat(messages);
+        this.messages = messages;
         return this.display();
     }
 
@@ -81,6 +85,7 @@ class TypescriptToolsView {
     }
 
     displayGutterMarkers() {
+        this.gutterView.clear();
         return this.gutterView.render(this.messages);
     }
 
