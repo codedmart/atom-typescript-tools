@@ -3,7 +3,7 @@
   "main": "./lib/init",
   "version": "0.0.1",
   "private": true,
-  "description": "Validates your typescript code.",
+  "description": "Provides typescript tooling for atom (compilation validation)",
   "repository": "https://github.com/park9140/atom-typescript-tools.git",
   "license": "MIT",
   "engines": {

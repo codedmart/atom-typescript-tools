@@ -64,6 +64,7 @@ class TypescriptTools {
                 );
                 filesToLoad = filesToLoad.concat(_.map(pfi.importedFiles, _.partial(loadFile, path.dirname(fileToLoad.filename))));
                 filesToLoad = filesToLoad.concat(_.map(pfi.referencedFiles, _.partial(loadFile, path.dirname(fileToLoad.filename))));
+                filesToLoad = _.compact(filesToLoad);
             }
         }
 
@@ -104,8 +105,6 @@ class TypescriptTools {
 
 
     getDiagnostics(filename: string): string {
-        console.log('get diagnostics', filename, this.languageService.getSemanticDiagnostics(filename));
-
         var syntactic = this.languageService.getSyntacticDiagnostics(filename);
         var semantic = this.languageService.getSemanticDiagnostics(filename);
         return _.reduce(semantic.concat(syntactic), (memo, diagnostic) => {

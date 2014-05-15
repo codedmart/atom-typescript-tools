@@ -1,4 +1,5 @@
 /// <reference path='./globals.d.ts' />
+
 import TypescriptToolsView = require('./typescript-tools-view');
 import StatusBarView = require('./statusbar-view');
 
@@ -20,16 +21,11 @@ var initialObject = {
         // Subscribing to every current and future editor
         return this.editorViewSubscription = atom.workspaceView.eachEditorView((editorView) => {
             this.injectTypescriptToolsViewIntoEditorView(editorView, this.statusBarView);
+            editorView.editor.on('grammar-changed', () => this.injectTypescriptToolsViewIntoEditorView(editorView, this.statusBarView));
         });
     },
     injectTypescriptToolsViewIntoEditorView: function(editorView, statusBarView) {
-        if (editorView.getPane() == null) {
-            return;
-        }
-        if (!editorView.attached) {
-            return;
-        }
-        if (editorView.editor.getGrammar().scopeName == 'source.ts' ) {
+        if (editorView.editor.getGrammar().scopeName === 'source.ts' ) {
             new TypescriptToolsView(editorView, statusBarView);
         }
     }
