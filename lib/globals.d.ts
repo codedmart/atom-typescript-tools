@@ -16,6 +16,24 @@ declare module 'atom' {
         function prependToBottom(what): any;
         function getActivePaneItem(): any;
     }
+
+    module Range {
+        function fromPointWithDelta(...anything): any;
+    }
+}
+
+declare module 'autocomplete-plus' {
+
+    class Provider {
+        constructor(...any);
+        public editor: any;
+        public editorView: any;
+        public prefixOfSelection: any;
+    }
+
+    class Suggestion {
+        constructor(...any);
+    }
 }
 
 declare var atom;

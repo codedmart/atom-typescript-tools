@@ -19,18 +19,17 @@ class TypescriptToolsView {
     //
     // editorView      The editor view
 
-    constructor(editorView, statusBarView) {
-        this.typescriptTools = new TypescriptTools();
+    constructor(editorView, statusBarView, typescriptTools: TypescriptTools) {
+        this.typescriptTools = typescriptTools;
         this.editor = editorView.editor;
         this.editorView = editorView;
         this.gutterView = new GutterView(editorView);
         this.statusBarView = statusBarView;
 
-        this.refresh = _.debounce(() => {
-            console.log('debounced');
+        this.refresh = () => {
             this.typescriptTools.updateFileInfo(this.editor.getUri(), this.editor.getText());
             this.processMessage(this.typescriptTools.getDiagnostics(this.editor.getUri()));
-        }, 100);
+        };
 
         atom.workspaceView.on('pane:active-item-changed', () => {
             this.statusBarView.hide();

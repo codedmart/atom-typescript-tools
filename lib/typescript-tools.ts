@@ -16,11 +16,10 @@ function loadFile(root, file) {
         } else if (fs.existsSync(filename + '.js')) {
             filename += '.js';
         } else {
-            console.log(filename, 'not found');
             return;
         }
     }
-    return {filename: filename, content: fs.readFileSync(filename, {encoding: 'utf8'}) };
+    return { filename: filename, content: fs.readFileSync(filename, { encoding: 'utf8' }) };
 }
 
 class TypescriptTools {
@@ -39,8 +38,8 @@ class TypescriptTools {
         var globals = path.resolve(__dirname, '../node_modules/typescript/bin/lib.d.ts');
         this.addFileInfo(
             globals,
-            fs.readFileSync(globals, {encoding: 'utf8'})
-        );
+            fs.readFileSync(globals, { encoding: 'utf8' })
+            );
     }
 
     createDefaultFormatCodeOptions() {
@@ -49,7 +48,7 @@ class TypescriptTools {
 
 
     updateFileInfo(filename: string, content: string) {
-        var filesToLoad: any[] = [{filename: filename, content: content}],
+        var filesToLoad: any[] = [{ filename: filename, content: content }],
             filesLoaded: string[] = [],
             fileToLoad: any;
 
@@ -61,14 +60,13 @@ class TypescriptTools {
                 var pfi = this.coreService.getPreProcessedFileInfo(
                     fileToLoad.filename,
                     this.languageServiceHost.getScriptSnapshot(fileToLoad.filename)
-                );
+                    );
                 filesToLoad = filesToLoad.concat(_.map(pfi.importedFiles, _.partial(loadFile, path.dirname(fileToLoad.filename))));
                 filesToLoad = filesToLoad.concat(_.map(pfi.referencedFiles, _.partial(loadFile, path.dirname(fileToLoad.filename))));
                 filesToLoad = _.compact(filesToLoad);
             }
         }
 
-        console.log();
     }
 
     addFileInfo(filename, content) {
@@ -84,7 +82,6 @@ class TypescriptTools {
             byteOrderMark: TypeScript.ByteOrderMark.None,
             snapshot: TypeScript.ScriptSnapshot.fromString(content)
         });
-        console.log(filename);
     }
 
     removeFileInfo(filename) {
@@ -93,7 +90,6 @@ class TypescriptTools {
 
     applyFormatterToContent(filename: string): string {
         var snapshot = this.languageServiceHost.getScriptSnapshot(filename);
-        console.log('formatting', filename, snapshot.getLength());
         var textEdits = this.languageService.getFormattingEditsForRange(
             filename,
             0,
@@ -103,6 +99,13 @@ class TypescriptTools {
         return this.applyTextEdit(snapshot.getText(0, snapshot.getLength()), textEdits);
     }
 
+    getCompletions(filename: string, row: number, column: number) {
+        var snapshot = this.languageServiceHost.getScriptSnapshot(filename);
+        var position = snapshot.getLineStartPositions()[row] + column;
+        console.log(position, snapshot.getText(position - 10, position));
+        var completions = this.languageService.getCompletionsAtPosition(filename, position, false);
+        return completions;
+    }
 
     getDiagnostics(filename: string): string {
         var syntactic = this.languageService.getSyntacticDiagnostics(filename);
@@ -113,7 +116,6 @@ class TypescriptTools {
                 line: diagnostic.line() + 1,
                 level: 'error'
             };
-            console.log(message);
             memo.push(message);
             return memo;
         }, []);
