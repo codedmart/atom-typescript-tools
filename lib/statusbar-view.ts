@@ -41,7 +41,7 @@ class StatusBarView extends Atom.View {
                 this.violations.append('<dt><span class=\'highlight-' +
                     item.level +
                     '\'>' +
-                    (item.typescriptTools) +
+                    'syntax' +
                     '</span></dt><dd>' + item.message + '</dd>');
                 this.show();
                 return i++;
