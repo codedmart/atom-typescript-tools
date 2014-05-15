@@ -10,26 +10,30 @@ class PathsProvider extends ac.Provider {
     constructor(editor, public typescriptTools: TypescriptTools) {
         super(editor);
     }
+    /**
+     * Build suggestions provids all the best for your suggestion building needs
+     *
+     * @method buildSuggestions
+     * @public
+     */
     buildSuggestions() {
         var selection = this.editor.getSelection(),
             prefix = this.prefixOfSelection(selection);
-        if (!prefix.length) {
-            return;
-        }
 
         var range = selection.getBufferRange();
-
         this.typescriptTools.updateFileInfo(this.editor.getUri(), this.editor.getText());
-        var suggestions =  _.map(this.typescriptTools.getCompletions(
+        var completions = this.typescriptTools.getCompletions(
             this.editor.getUri(),
             range.start.row,
-            range.start.column), () => {
+            range.start.column, prefix);
+        var suggestions =  _.map(completions, (completion) => {
+            console.log(completion);
             return new ac.Suggestion(this, {
-                word: name,
+                word: completion.name,
                 prefix: prefix,
-                label: name,
+                label: completion.docComment,
                 data: {
-                    body: name
+                    body: completion.name
                 }
             });
         });

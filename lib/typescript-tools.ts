@@ -1,12 +1,14 @@
 ///<reference path='./globals.d.ts' />
 // The base class for linters.
 // Subclasses must at a minimum define the attributes syntax, cmd, and regex.
+
 declare var __dirname;
 import TypeScript = require('../node_modules/typescript-toolbox/typescript/tss');
 import Harness = require('./typescript-harness');
 var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
+var fuzzaldrin = require('fuzzaldrin');
 
 function loadFile(root, file) {
     var filename = file.path.indexOf('/') === 0 ? file : path.resolve(root, file.path);
@@ -99,12 +101,18 @@ class TypescriptTools {
         return this.applyTextEdit(snapshot.getText(0, snapshot.getLength()), textEdits);
     }
 
-    getCompletions(filename: string, row: number, column: number) {
+    getCompletions(filename: string, row: number, column: number, prefix: string) {
         var snapshot = this.languageServiceHost.getScriptSnapshot(filename);
         var position = snapshot.getLineStartPositions()[row] + column;
-        console.log(position, snapshot.getText(position - 10, position));
-        var completions = this.languageService.getCompletionsAtPosition(filename, position, false);
-        return completions;
+        var completions = this.languageService.getCompletionsAtPosition(filename, position, true);
+        completions = completions ? completions.entries : [];
+        if (prefix.length) {
+            completions = fuzzaldrin.filter(completions, prefix, {key: 'name'});
+        }
+        completions = _.map(completions, (completion) => {
+            return this.languageService.getCompletionEntryDetails(filename, position, completion.name);
+        });
+        return _.compact(completions);
     }
 
     getDiagnostics(filename: string): string {
