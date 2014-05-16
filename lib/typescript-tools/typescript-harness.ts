@@ -1,6 +1,6 @@
-///<reference path='./globals.d.ts' />
+///<reference path='../globals.d.ts' />
 
-import TypeScript = require('../node_modules/typescript-toolbox/typescript/tss');
+import TypeScript = require('../../node_modules/typescript-toolbox/typescript/tss');
 export class FileInfo {
     fileName: string;
     version: number;
@@ -9,7 +9,7 @@ export class FileInfo {
     snapshot: TypeScript.IScriptSnapshot;
 }
 export class CoreServiceHostImpl implements TypeScript.Services.ICoreServicesHost {
-        logger: TypeScript.ILogger = new TypeScript.NullLogger();
+    logger: TypeScript.ILogger = new TypeScript.NullLogger();
 }
 
 export class LanguageServiceHostImpl implements TypeScript.Services.ILanguageServiceHost {
@@ -103,7 +103,7 @@ export class LanguageServiceHostImpl implements TypeScript.Services.ILanguageSer
         return path;
     }
 
-	// original
+    // original
     addFile(file: FileInfo) {
         this.fileInfos[file.fileName] = file;
     }

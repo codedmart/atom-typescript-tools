@@ -1,7 +1,7 @@
 ///<reference path='./globals.d.ts' />
 import GutterView = require('./gutter-view');
 
-import TypescriptTools = require('./typescript-tools');
+import typescriptToolsLink = require('./typescript-tools/typescript-tools-link');
 var _ = require('underscore');
 
 // The base class for linters.
@@ -11,7 +11,7 @@ class TypescriptToolsView {
     public editorView;
     public gutterView;
     public statusBarView;
-    public typescriptTools;
+    public typescriptToolsLink;
     public refresh;
     public messages = [];
 
@@ -19,18 +19,18 @@ class TypescriptToolsView {
     //
     // editorView      The editor view
 
-    constructor(editorView, statusBarView, typescriptTools: TypescriptTools) {
-        this.typescriptTools = typescriptTools;
+    constructor(editorView, statusBarView) {
         this.editor = editorView.editor;
         this.editorView = editorView;
         this.gutterView = new GutterView(editorView);
         this.statusBarView = statusBarView;
 
         this.refresh = () => {
-            this.typescriptTools.updateFileInfo(this.editor.getUri(), this.editor.getText());
-            this.processMessage(this.typescriptTools.getDiagnostics(this.editor.getUri()));
+            typescriptToolsLink.updateFileInfo(this.editor.getUri(), this.editor.getText());
+            typescriptToolsLink.requestDiagnostics(this.editor.getUri())
         };
 
+        typescriptToolsLink.onDiagnostics(this.processMessage.bind(this));
         atom.workspaceView.on('pane:active-item-changed', () => {
             this.statusBarView.hide();
             if (this.editor.id === atom.workspace.getActiveEditor().id) {
@@ -40,9 +40,9 @@ class TypescriptToolsView {
 
         this.handleBufferEvents();
 
-        this.typescriptTools.updateFileInfo(this.editor.getUri(), this.editor.getText());
+        typescriptToolsLink.updateFileInfo(this.editor.getUri(), this.editor.getText());
         this.editorView.command('atom-typescript-tools:format', () => {
-            this.editor.setText(this.typescriptTools.applyFormatterToContent(this.editor.getUri()));
+            this.editor.setText(typescriptToolsLink.applyFormatterToContent(this.editor.getUri()));
         });
 
         this.editorView.on('editor:display-updated', () => this.gutterView.render(this.messages));
@@ -62,7 +62,7 @@ class TypescriptToolsView {
 
         buffer.on('destroyed', () => {
 
-            this.typescriptTools.removeFileInfo(this.editor.getUri());
+            typescriptToolsLink.removeFileInfo(this.editor.getUri());
             buffer.off('saved');
 
             return buffer.off('destroyed');

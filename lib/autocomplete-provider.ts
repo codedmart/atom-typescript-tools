@@ -4,10 +4,10 @@ import Atom = require('atom');
 import ac = require('autocomplete-plus');
 var _ = require('underscore');
 
-import TypescriptTools = require('./typescript-tools');
+import typescriptToolsLink = require('./typescript-tools/typescript-tools-link');
 
 class PathsProvider extends ac.Provider {
-    constructor(editor, public typescriptTools: TypescriptTools) {
+    constructor(editor) {
         super(editor);
     }
     /**
@@ -20,14 +20,13 @@ class PathsProvider extends ac.Provider {
         var selection = this.editor.getSelection(),
             prefix = this.prefixOfSelection(selection);
 
-        var range = selection.getBufferRange();
-        this.typescriptTools.updateFileInfo(this.editor.getUri(), this.editor.getText());
-        var completions = this.typescriptTools.getCompletions(
+        //var range = selection.getBufferRange();
+        /*typescriptToolsLink.updateFileInfo(this.editor.getUri(), this.editor.getText());
+        var completions = typescriptToolsLink.requestCompletions(
             this.editor.getUri(),
             range.start.row,
             range.start.column, prefix);
         var suggestions =  _.map(completions, (completion) => {
-            console.log(completion);
             return new ac.Suggestion(this, {
                 word: completion.name,
                 prefix: prefix,
@@ -41,7 +40,8 @@ class PathsProvider extends ac.Provider {
         if (!suggestions.length) {
             return;
         }
-        return suggestions;
+        return suggestions;*/
+        return [];
     }
 
 

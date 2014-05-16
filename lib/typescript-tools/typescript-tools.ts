@@ -1,9 +1,8 @@
-///<reference path='./globals.d.ts' />
+///<reference path='../globals.d.ts' />
 // The base class for linters.
 // Subclasses must at a minimum define the attributes syntax, cmd, and regex.
-
 declare var __dirname;
-import TypeScript = require('../node_modules/typescript-toolbox/typescript/tss');
+import TypeScript = require('../../node_modules/typescript-toolbox/typescript/tss');
 import Harness = require('./typescript-harness');
 var _ = require('underscore');
 var fs = require('fs');
@@ -37,7 +36,7 @@ class TypescriptTools {
         this.languageServiceCompiler = new TypeScript.Services.LanguageServiceCompiler(this.languageServiceHost);
         this.coreService = new TypeScript.Services.CoreServices(new Harness.CoreServiceHostImpl());
         this.formatCodeOptions = this.createDefaultFormatCodeOptions();
-        var globals = path.resolve(__dirname, '../node_modules/typescript/bin/lib.d.ts');
+        var globals = path.resolve(__dirname, '../../node_modules/typescript/bin/lib.d.ts');
         this.addFileInfo(
             globals,
             fs.readFileSync(globals, { encoding: 'utf8' })
@@ -90,17 +89,6 @@ class TypescriptTools {
         this.languageServiceHost.removeFile(filename);
     }
 
-    applyFormatterToContent(filename: string): string {
-        var snapshot = this.languageServiceHost.getScriptSnapshot(filename);
-        var textEdits = this.languageService.getFormattingEditsForRange(
-            filename,
-            0,
-            snapshot.getLength(),
-            this.formatCodeOptions);
-
-        return this.applyTextEdit(snapshot.getText(0, snapshot.getLength()), textEdits);
-    }
-
     getCompletions(filename: string, row: number, column: number, prefix: string) {
         var snapshot = this.languageServiceHost.getScriptSnapshot(filename);
         var position = snapshot.getLineStartPositions()[row] + column;
@@ -112,6 +100,17 @@ class TypescriptTools {
         completions = _.map(completions, (completion) => {
             return this.languageService.getCompletionEntryDetails(filename, position, completion.name);
         });
+
+        if (prefix.toLowerCase() === completions[0].name.toLowerCase()) {
+            this.languageService.getSignatureAtPosition(filename, position);
+            var options = [];
+            _.each(options, (option) => {
+                completions.unshift(<any>{
+                    name: option
+                });
+            });
+        }
+        console.log('signature', prefix, this.languageService.getSignatureAtPosition(filename, position));
         return _.compact(completions);
     }
 
@@ -127,6 +126,17 @@ class TypescriptTools {
             memo.push(message);
             return memo;
         }, []);
+    }
+
+    applyFormatterToContent(filename: string): string {
+        var snapshot = this.languageServiceHost.getScriptSnapshot(filename);
+        var textEdits = this.languageService.getFormattingEditsForRange(
+            filename,
+            0,
+            snapshot.getLength(),
+            this.formatCodeOptions);
+
+        return this.applyTextEdit(snapshot.getText(0, snapshot.getLength()), textEdits);
     }
 
     applyTextEdit(content: string, textEdits: TypeScript.Services.TextEdit[]): string {

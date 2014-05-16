@@ -3,7 +3,7 @@
 import TypescriptToolsView = require('./typescript-tools-view');
 import StatusBarView = require('./statusbar-view');
 
-import TypescriptTools = require('./typescript-tools');
+import typescriptToolsLink = require('./typescript-tools/typescript-tools-link');
 import AutocompleteProvider = require('./autocomplete-provider');
 
 var _ = require('underscore');
@@ -22,11 +22,11 @@ var initialObject = {
             this.autocomplete = pkg.mainModule;
         });
     },
-    registerAutoCompleteProviders: function(editorView, tstools) {
+    registerAutoCompleteProviders: function(editorView) {
         setTimeout( () => {
             var provider;
             if (editorView.attached && !editorView.mini) {
-                provider = new AutocompleteProvider(editorView, tstools);
+                provider = new AutocompleteProvider(editorView);
                 this.autocomplete.registerProviderForEditorView(provider, editorView);
                 return this.providers.push(provider);
             }
@@ -44,9 +44,8 @@ var initialObject = {
     },
     injectTypescriptToolsViewIntoEditorView: function(editorView, statusBarView) {
         if (editorView.editor.getGrammar().scopeName === 'source.ts') {
-            var tstools = new TypescriptTools();
-            this.registerAutoCompleteProviders(editorView, tstools);
-            new TypescriptToolsView(editorView, statusBarView, tstools);
+            this.registerAutoCompleteProviders(editorView);
+            new TypescriptToolsView(editorView, statusBarView);
         }
     },
 

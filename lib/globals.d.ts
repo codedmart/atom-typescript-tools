@@ -20,6 +20,11 @@ declare module 'atom' {
     module Range {
         function fromPointWithDelta(...anything): any;
     }
+
+    class BufferedNodeProcess {
+        constructor(...any);
+        public process: any;
+    }
 }
 
 declare module 'autocomplete-plus' {

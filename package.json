@@ -10,7 +10,7 @@
     "atom": ">0.50.0"
   },
   "scripts": {
-    "install": "node_modules/.bin/tsc lib/init.ts --module commonjs"
+    "install": "node_modules/.bin/tsc lib/init.ts lib/typescript-tools/process.ts --module commonjs"
   },
   "dependencies": {
     "autocomplete-plus": "git://github.com/saschagehlich/autocomplete-plus.git",
