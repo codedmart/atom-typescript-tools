@@ -115,12 +115,18 @@ class TypescriptTools {
     }
 
     getDiagnostics(filename: string): string {
+        var snapshot = this.languageServiceHost.getScriptSnapshot(filename);
         var syntactic = this.languageService.getSyntacticDiagnostics(filename);
         var semantic = this.languageService.getSemanticDiagnostics(filename);
+        var lineStarts = snapshot.getLineStartPositions();
         return _.reduce(semantic.concat(syntactic), (memo, diagnostic) => {
+            var line = diagnostic.line(),
+                start = diagnostic.start() - lineStarts[line];
             var message = {
                 message: diagnostic.message(),
-                line: diagnostic.line() + 1,
+                line: line,
+                start: start,
+                end: start + diagnostic.length(),
                 level: 'error'
             };
             memo.push(message);

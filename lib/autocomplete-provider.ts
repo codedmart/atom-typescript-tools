@@ -15,6 +15,7 @@ class PathsProvider extends ac.Provider {
      *
      * @method buildSuggestions
      * @public
+
      */
     buildSuggestions() {
         var selection = this.editor.getSelection(),

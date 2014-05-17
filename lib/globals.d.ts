@@ -17,14 +17,20 @@ declare module 'atom' {
         function getActivePaneItem(): any;
     }
 
-    module Range {
-        function fromPointWithDelta(...anything): any;
+    class Range {
+        constructor(...any);
+        public static fromPointWithDelta(...anything): any;
     }
 
     class BufferedNodeProcess {
-        constructor(...any);
+        constructor(editor);
         public process: any;
     }
+}
+
+declare class Linter {
+    constructor(...any);
+    public editor: any;
 }
 
 declare module 'autocomplete-plus' {

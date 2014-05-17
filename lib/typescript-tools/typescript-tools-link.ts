@@ -30,7 +30,6 @@ function subscribeMessage(message, callback) {
         }
     });
 }
-tasd
 
 function sendMessage(message, data) {
     childProcess.send(JSON.stringify({message: message, data: data}));
