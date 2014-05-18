@@ -1,1 +1,1 @@
-module.exports = require('./init.js');
+module.exports = require('./init.js')
